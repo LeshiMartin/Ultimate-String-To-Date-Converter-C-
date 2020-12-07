@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -8,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace ultimate_string_to_date_converter
 {
-#nullable enable
+
     public static class StringToDateConverter
     {
         static StringToDateConverter()
@@ -25,20 +26,30 @@ namespace ultimate_string_to_date_converter
                     DateFormats.Add(format, format);
             }
         }
-        public static DateTime ParseToDate(string dateString, IFormatProvider? provider = null, DateTimeStyles? dateStyle = null)
+        public static DateTime ParseToDate(string dateString, IFormatProvider provider = null, DateTimeStyles? dateStyle = null)
         {
             provider = provider ?? CultureInfo.InvariantCulture;
             dateStyle = dateStyle ?? DateTimeStyles.None;
-            
-            
+
+
             foreach (var kvp in DateFormats)
             {
                 if (DateTime.TryParseExact(dateString, kvp.Value, provider, dateStyle.Value, out DateTime date))
                     return date;
             }
+            try
+            {
+                return Convert.ToDateTime(dateString);
+
+            }
+            catch (Exception exc)
+            {
+                Debug.WriteLine(exc);
+                throw new ArgumentException("The provided string was not found in any of the formats");
+            }
             throw new ArgumentException("The provided string was not found in any of the formats");
         }
-        public static bool TryParseDate(string dateString, out DateTime returnDate, IFormatProvider? provider = null, DateTimeStyles? dateStyle = null)
+        public static bool TryParseDate(string dateString, out DateTime returnDate, IFormatProvider provider = null, DateTimeStyles? dateStyle = null)
         {
             if (dateString.Contains("tt"))
             {
@@ -58,18 +69,36 @@ namespace ultimate_string_to_date_converter
                     break;
                 }
             }
-
-            return converted;
+            if (converted)
+                return converted;
+            else
+            {
+                try
+                {
+                    returnDate = Convert.ToDateTime(dateString);
+                    converted = true;
+                    return converted;
+                }
+                catch (Exception exc)
+                {
+                    Debug.WriteLine(exc);
+                    return converted;
+                }
+            }
         }
         private static IDictionary<string, string> GetDateFormatConfig()
         {
+
             var resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("date-formats.json");
-            using var reader = new StreamReader(resourceStream, Encoding.UTF8);
-            var js = reader.ReadToEndAsync().Result;
-            if (js is null)
-                return new Dictionary<string, string>();
-            var formats = JsonConvert.DeserializeObject<Dictionary<string, string>>(js);
-            return formats;
+            using (var reader = new StreamReader(resourceStream, Encoding.UTF8))
+            {
+                ;
+                var js = reader.ReadToEndAsync().Result;
+                if (js is null)
+                    return new Dictionary<string, string>();
+                var formats = JsonConvert.DeserializeObject<Dictionary<string, string>>(js);
+                return formats;
+            }
         }
     }
 }

@@ -1,8 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>ultimate_string_to_date_converter</RootNamespace>
+    <PackageId>ultimate_string_to_date_converter</PackageId>
+    <Version>1.2.3</Version>
+    <Authors>martin_leshi</Authors>
+    <Language>C#</Language>
+    <RepositoryUrl>
+      https://github.com/LeshiMartin/Ultimate-String-To-Date-Converter-C-
+    </RepositoryUrl>
+    <Description>
+      Converter For string to date containing more thatn 25 000 formats.
+      Downgraded the framework to 2.0 to be available to older frameworks.
+      Update the conveter
+    </Description>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="date-formats.json">
@@ -11,6 +23,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="newtonsoft.json" Version="12.0.3" />
+    <PackageReference Include="newtonsoft.json" Version="10.0.1" />
   </ItemGroup>
 </Project>
